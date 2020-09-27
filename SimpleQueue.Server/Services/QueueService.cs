@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Threading.Channels;
 using SimpleQueue.Common.Models;
 using SimpleQueue.Server.MemoryQueue;
 using SimpleQueue.Common.DataAccess;
@@ -28,16 +26,20 @@ namespace SimpleQueue.Server.Services
             {
                 return null;
             }
-            if (channel.Writer.TryWrite(message))
+            var result = _dbContext.QueueMessage.Add(message);
+            _dbContext.SaveChanges();
+            if (result.Entity != null)
             {
-                _dbContext.QueueMessage.Add(message);
-                _dbContext.SaveChanges();
-                return message;
+                if (channel.Writer.TryWrite(result.Entity))
+                {
+                    return result.Entity;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         public QueueMessage Get(Guid queueId)
@@ -51,10 +53,15 @@ namespace SimpleQueue.Server.Services
             channel.Reader.TryRead(out message);
             if (message != null)
             {
-                message.Status = MessageStatus.Processing;
-                _dbContext.QueueMessage.Update(message);
-                _dbContext.SaveChanges();
-                return message;
+                var existingMessage = _dbContext.QueueMessage.Find(message.Id);
+                if (existingMessage != null)
+                {
+                    existingMessage.Status = MessageStatus.Processing;
+                    _dbContext.QueueMessage.Update(existingMessage);
+                    _dbContext.SaveChanges();
+                    return message;
+                }
+                return null;
             }
             else
             {
@@ -65,7 +72,9 @@ namespace SimpleQueue.Server.Services
 
         public QueueMessage Update(Guid queueId, QueueMessage message)
         {
-            var updatedMessage = _dbContext.QueueMessage.Update(message);
+            var existingMessage = _dbContext.QueueMessage.Find(message.Id);
+            existingMessage.Status = message.Status;
+            var updatedMessage = _dbContext.QueueMessage.Update(existingMessage);
             _dbContext.SaveChanges();
             return updatedMessage.Entity;
         }

@@ -52,7 +52,7 @@ namespace SimpleQueue.Consumer
         public static void DoWork(QueueMessage message)
         {
             var rnd = new Random();
-            var number = rnd.Next(500, 5000);
+            var number = rnd.Next(100, 500);
             Console.WriteLine($"Processing {message.Id}");
             Thread.Sleep(number);
             Console.WriteLine($"Processing of {message.Id} done");

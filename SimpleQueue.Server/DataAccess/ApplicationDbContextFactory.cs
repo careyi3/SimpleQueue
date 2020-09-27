@@ -10,6 +10,16 @@ namespace SimpleQueue.Server.DataAccess
         private string _connectionString;
         public ApplicationDbContext CreateDbContext(string[] args)
         {
+            return Create();
+        }
+
+        public ApplicationDbContext CreateDbContext()
+        {
+            return Create();
+        }
+
+        private ApplicationDbContext Create()
+        {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseSqlServer(ConnectionString, b => b.MigrationsAssembly("SimpleQueue.Server"));
 

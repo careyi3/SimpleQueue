@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleQueue.Server.Services;
+using SimpleQueue.Server.DataAccess;
 using SimpleQueue.Common.DataAccess;
 using SimpleQueue.Server.MemoryQueue;
 
@@ -30,6 +31,7 @@ namespace SimpleQueue.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<ApplicationDbContextFactory>();
             services.AddSingleton<QueueManager>();
             services.AddTransient<QueueService>();
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -54,7 +56,12 @@ namespace SimpleQueue.Server
                 endpoints.MapControllers();
             });
 
-            app.ApplicationServices.GetService<QueueManager>();
+            Setup(app);
+        }
+
+        private void Setup(IApplicationBuilder app)
+        {
+            app.ApplicationServices.GetService<QueueManager>().Setup();
         }
     }
 }
