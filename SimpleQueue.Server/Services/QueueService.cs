@@ -83,5 +83,16 @@ namespace SimpleQueue.Server.Services
         {
             return _dbContext.Queue.ToList();
         }
+
+        public IDictionary<string, int> QueueStatus(Guid queueId)
+        {
+            var statuses = new Dictionary<string, int>();
+            foreach (var status in (MessageStatus[])Enum.GetValues(typeof(MessageStatus)))
+            {
+                var count = _dbContext.QueueMessage.Count(x => x.QueueId == queueId && x.Status == status);
+                statuses.Add(status.ToString(), count);
+            }
+            return statuses;
+        }
     }
 }

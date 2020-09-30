@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleQueue.Common.Models;
 using SimpleQueue.Server.Services;
+using SimpleQueue.Common.Enums;
 
 namespace SimpleQueue.Server.Controllers
 {
@@ -27,6 +28,12 @@ namespace SimpleQueue.Server.Controllers
         public IEnumerable<Queue> Get()
         {
             return _queueService.ListQueues();
+        }
+
+        [HttpGet("{id}")]
+        public IDictionary<string, int> Get(string id)
+        {
+            return _queueService.QueueStatus(Guid.Parse(id));
         }
     }
 }
