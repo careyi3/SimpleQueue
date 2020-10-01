@@ -61,7 +61,11 @@ namespace SimpleQueue.Server.MemoryQueue
 
         private void PopulateQueues(ApplicationDbContext dbContext)
         {
-            var messages = dbContext.QueueMessage.Where(x => x.Status == MessageStatus.Queued || x.Status == MessageStatus.Failed).OrderBy(x => x.CreatedAt).ToList();
+            var messages = dbContext.QueueMessage.Where(x =>
+                x.Status == MessageStatus.Queued ||
+                x.Status == MessageStatus.Failed ||
+                (x.Status == MessageStatus.Processing && x.ModifiedAt < DateTimeOffset.Now.AddHours(-1))
+                ).OrderBy(x => x.CreatedAt).ToList();
 
             foreach (var message in messages)
             {

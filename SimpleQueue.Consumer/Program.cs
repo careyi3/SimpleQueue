@@ -36,6 +36,7 @@ namespace SimpleQueue.Consumer
                         }
                         catch (Exception)
                         {
+                            Console.WriteLine($"Processing of {message.Id} failed.");
                             messageStatus = MessageStatus.Failed;
                         }
                         message.Status = messageStatus;
@@ -52,9 +53,13 @@ namespace SimpleQueue.Consumer
         public static void DoWork(QueueMessage message)
         {
             var rnd = new Random();
-            var number = rnd.Next(100, 500);
+            var number = rnd.Next(2000, 5000);
             Console.WriteLine($"Processing {message.Id}");
             Thread.Sleep(number);
+            if (number > 4000)
+            {
+                throw new Exception();
+            }
             Console.WriteLine($"Processing of {message.Id} done");
         }
 

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
+import QueueStatus from "./QueueStatus";
 import "./App.css";
 import Select from "react-select";
 
@@ -12,7 +12,7 @@ class App extends Component {
       selectOptions: [],
       selectedQueue: null,
       queueStatus: null,
-      pollingDelay: 1000,
+      pollingDelay: 500,
     };
 
     this.handleQueueSelectChange = this.handleQueueSelectChange.bind(this);
@@ -85,49 +85,34 @@ class App extends Component {
   };
 
   render() {
-    const { error, isLoaded, selectOptions, queueStatus } = this.state;
+    const {
+      error,
+      isLoaded,
+      selectOptions,
+      queueStatus,
+      pollingDelay,
+    } = this.state;
     if (error) {
       return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
       return <div>Loading...</div>;
     } else {
-      if (queueStatus) {
-        return (
-          <div className="body">
-            <div>
-              <h2>Queues</h2>
-              <Select
-                options={selectOptions}
-                onChange={this.handleQueueSelectChange}
-                isClearable={true}
-              />
-            </div>
-            <div>
-              <h3>Status</h3>
-              <p>Queued - {queueStatus["Queued"]}</p>
-              <p>Processing - {queueStatus["Processing"]}</p>
-              <p>Failed - {queueStatus["Failed"]}</p>
-              <p>Done - {queueStatus["Done"]}</p>
-            </div>
+      return (
+        <div className="body">
+          <div>
+            <h2>Queues</h2>
+            <Select
+              options={selectOptions}
+              onChange={this.handleQueueSelectChange}
+              isClearable={true}
+            />
           </div>
-        );
-      } else {
-        return (
-          <div className="body">
-            <div>
-              <h2>Queues</h2>
-              <Select
-                options={selectOptions}
-                onChange={this.handleQueueSelectChange}
-                isClearable={true}
-              />
-            </div>
-            <div>
-              <p>Please select a queue to view status.</p>
-            </div>
-          </div>
-        );
-      }
+          <QueueStatus
+            queueStatus={queueStatus}
+            refreshPeriod={pollingDelay / 1000}
+          />
+        </div>
+      );
     }
   }
 }

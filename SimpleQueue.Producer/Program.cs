@@ -27,7 +27,9 @@ namespace SimpleQueue.Producer
                     count++;
                     Console.Clear();
                     Console.WriteLine($"Messages Send: {count}");
-                    Thread.Sleep(100);
+                    var rnd = new Random();
+                    var number = rnd.Next(3000, 5000);
+                    Thread.Sleep(number);
                 }
                 catch (Exception)
                 {
